@@ -25,18 +25,38 @@ Image create_special() {
 // So you will return a new image
 Image brightness(const Image &im, float factor) {
   // --------- HANDOUT  PS01 ------------------------------
-  // Image output(im.width(), im.height(), im.channels());
+    Image output(im.width(), im.height(), im.channels());
   // Modify image brightness
   // return output;
-  return Image(1, 1, 1); // Change this
+    for (int i=0; i<im.width(); i++) {
+        for (int j=0; j<im.height(); j++) {
+            for (int k=0; k<im.channels(); k++) {
+                float x = factor * im(i, j, k);
+                x = max(0.0f, min(1.0f, x));
+                output(i, j, k) = x;
+            }
+        }
+    }
+    return output;
 }
 
 Image contrast(const Image &im, float factor, float midpoint) {
   // --------- HANDOUT  PS01 ------------------------------
-  // Image output(im.width(), im.height(), im.channels());
+    Image output(im.width(), im.height(), im.channels());
   // Modify image contrast
   // return output;
-  return Image(1, 1, 1); // Change this
+    for (int i=0; i<im.width(); i++) {
+        for (int j=0; j<im.height(); j++) {
+            for (int k=0; k<im.channels(); k++) {
+                float x = factor * (im(i, j, k) - midpoint);
+                x += midpoint;
+                x = min(1.0f, x);
+                x = max(0.0f, x);
+                output(i, j, k) = x;
+            }
+        }
+    }
+    return output;
 }
 
 Image color2gray(const Image &im, const std::vector<float> &weights) {

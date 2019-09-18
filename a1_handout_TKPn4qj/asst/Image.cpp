@@ -89,14 +89,64 @@ float &Image::operator()(int x, int y, int z) {
 void Image::set_color(float r, float g, float b) {
   // --------- HANDOUT  PS01 ------------------------------
   // Set the image pixels to the corresponding values
-  throw NotImplementedException(); // change this
+    switch(DIMS) {
+        case 1:
+            for (int i=0; i<width(); i++) {
+                operator()(i) = r;
+            }
+            break;
+        case 2:
+            for (int i=0; i<width(); i++) {
+                for (int j=0; j<height(); j++) {
+                    operator()(i, j) = r;
+                }
+            }
+            break;
+        case 3:
+            for (int i=0; i<width(); i++) {
+                for (int j=0; j<height(); j++) {
+                    operator()(i, j, 0) = r;
+                    operator()(i, j, 1) = g;
+                    operator()(i, j, 2) = b;
+                }
+            }
+            break;
+        default:
+            cout << "ERROR" << endl;
+            break;
+    }
 }
 
 void Image::create_rectangle(int xstart, int ystart, int xend, int yend,
                              float r, float g, float b) {
   // --------- HANDOUT  PS01 ------------------------------
   // Set the pixels inside the rectangle to the specified color
-  throw NotImplementedException(); // change this
+    switch(DIMS) {
+        case 1:
+            for (int i=xstart; i<=xend; i++) {
+                operator()(i) = r;
+            }
+            break;
+        case 2:
+            for (int i=xstart; i<=xend; i++) {
+                for (int j=ystart; j<=yend; j++) {
+                    operator()(i, j) = r;
+                }
+            }
+            break;
+        case 3:
+            for (int i=xstart; i<=xend; i++) {
+                for (int j=ystart; j<=yend; j++) {
+                    operator()(i, j, 0) = r;
+                    operator()(i, j, 1) = g;
+                    operator()(i, j, 2) = b;
+                }
+            }
+            break;
+        default:
+            cout << "ERROR" << endl;
+            break;
+    }
 }
 
 void Image::create_line(int xstart, int ystart, int xend, int yend, float r,
