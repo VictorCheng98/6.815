@@ -25,45 +25,55 @@ Image create_special() {
 // So you will return a new image
 Image brightness(const Image &im, float factor) {
   // --------- HANDOUT  PS01 ------------------------------
-    Image output(im.width(), im.height(), im.channels());
+  Image output(im.width(), im.height(), im.channels());
   // Modify image brightness
   // return output;
-    for (int i=0; i<im.width(); i++) {
-        for (int j=0; j<im.height(); j++) {
-            for (int k=0; k<im.channels(); k++) {
-                float x = factor * im(i, j, k);
-                x = max(0.0f, min(1.0f, x));
-                output(i, j, k) = x;
-            }
-        }
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      for (int k=0; k<im.channels(); k++) {
+        float x = factor * im(i, j, k);
+        x = max(0.0f, min(1.0f, x));
+        output(i, j, k) = x;
+      }
     }
-    return output;
+  }
+  return output;
 }
 
 Image contrast(const Image &im, float factor, float midpoint) {
   // --------- HANDOUT  PS01 ------------------------------
-    Image output(im.width(), im.height(), im.channels());
+  Image output(im.width(), im.height(), im.channels());
   // Modify image contrast
   // return output;
-    for (int i=0; i<im.width(); i++) {
-        for (int j=0; j<im.height(); j++) {
-            for (int k=0; k<im.channels(); k++) {
-                float x = factor * (im(i, j, k) - midpoint);
-                x += midpoint;
-                x = min(1.0f, x);
-                x = max(0.0f, x);
-                output(i, j, k) = x;
-            }
-        }
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      for (int k=0; k<im.channels(); k++) {
+        float x = factor * (im(i, j, k) - midpoint);
+        x += midpoint;
+        x = min(1.0f, x);
+        x = max(0.0f, x);
+        output(i, j, k) = x;
+      }
     }
-    return output;
+  }
+  return output;
 }
 
 Image color2gray(const Image &im, const std::vector<float> &weights) {
   // --------- HANDOUT  PS01 ------------------------------
-  // Image output(im.width(), im.height(), 1);
+  Image output(im.width(), im.height(), 1);
   // Convert to grayscale
-  return Image(1, 1, 1); // Change this
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      float total = 0.0f;
+      for (int k=0; k < im.channels(); k++) {
+        total += weights[k] * im(i, j, k);
+      }
+      float total_weights = weights[0] + weights[1] + weights[2];
+      output(i, j) = total / total_weights;
+    }
+  }
+  return output;
 }
 
 // For this function, we want two outputs, a single channel luminance image
@@ -72,9 +82,27 @@ Image color2gray(const Image &im, const std::vector<float> &weights) {
 std::vector<Image> lumiChromi(const Image &im) {
   // --------- HANDOUT  PS01 ------------------------------
   // Create the luminance image
+  Image lum = color2gray(im);
   // Create the chrominance image
+  Image chrom(im.width(), im.height(), 3);
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      for (int k=0; k<im.channels(); k++) {
+        if (lum(i, j) != 0) {
+            chrom(i, j, k) = im(i, j, k) / lum(i, j);
+        } 
+        else {
+            chrom(i, j, k) = 0.0;
+        }
+          
+      }
+    }
+  }
   // Create the output vector as (luminance, chrominance)
-  return std::vector<Image>(); // Change this
+  std::vector<Image> out_vec;
+  out_vec.push_back(lum);
+  out_vec.push_back(chrom);
+	return out_vec;
 }
 
 // Modify brightness then contrast
@@ -82,21 +110,47 @@ Image brightnessContrastLumi(const Image &im, float brightF, float contrastF,
                              float midpoint) {
   // --------- HANDOUT  PS01 ------------------------------
   // Modify brightness, then contrast of luminance image
-  return Image(1, 1, 1); // Change this
+  std::vector<Image> lumiChrom = lumiChromi(im);
+  Image newLumi = contrast(brightness(lumiChrom[0], brightF), contrastF, midpoint);
+  Image output(im.width(), im.height(), im.channels());
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      for (int k=0; k<im.channels(); k++) {
+        output(i, j, k) = newLumi(i, j) * lumiChrom[1](i, j, k);
+      }
+    }
+  }
+  return output;
 }
 
 Image rgb2yuv(const Image &im) {
   // --------- HANDOUT  PS01 ------------------------------
   // Create output image of appropriate size
   // Change colorspace
-  return Image(1, 1, 1); // Change this
+  Image yuv(im.width(), im.height(), im.channels());
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      yuv(i, j, 0) = (.299 * im(i, j, 0)) + (.587 * im(i, j, 1)) + (.144 * im(i, j, 2));
+      yuv(i, j, 1) = (-.147 * im(i, j, 0)) + (-0.289 * im(i, j, 1)) + (.436 * im(i, j, 2));
+      yuv(i, j, 2) = (.615 * im(i, j, 0)) + (-.515 * im(i, j, 1)) + (-.100 * im(i, j, 2));
+    }
+  }
+  return yuv;
 }
 
 Image yuv2rgb(const Image &im) {
   // --------- HANDOUT  PS01 ------------------------------
   // Create output image of appropriate size
   // Change colorspace
-  return Image(1, 1, 1); // Change this
+  Image rgb(im.width(), im.height(), im.channels());
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      rgb(i, j, 0) = im(i, j, 0) + 0 + 1.14 * im(i, j, 2);
+      rgb(i, j, 1) = im(i, j, 0) + -0.395 * im(i, j, 1) + -.581 * im(i, j, 2);
+      rgb(i, j, 2) = im(i, j, 0) + 2.032 * im(i, j, 1) + 0;
+    }
+  }
+  return rgb;
 }
 
 Image saturate(const Image &im, float factor) {
@@ -104,7 +158,14 @@ Image saturate(const Image &im, float factor) {
   // Create output image of appropriate size
   // Saturate image
   // return output;
-  return Image(1, 1, 1); // Change this
+  Image output = rgb2yuv(im);
+    for (int i=0; i<im.width(); i++) {
+      for (int j=0; j<im.height(); j++) {
+        output(i, j, 1) *= factor;
+        output(i, j, 2) *= factor;
+      }
+    }
+    return rgb2yuv(output);
 }
 
 // Gamma codes the image
