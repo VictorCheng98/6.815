@@ -9,8 +9,8 @@ int main() {
   cout << "nothing done in a1_main.cpp, debug me !" << endl;
 
   // Example
-  // Image im("./Input/castle_small.png");
-  // std::vector<Image> LC = lumiChromi(im);
-  // LC[0].write("./Output/castle_luminance.png");
-  // LC[1].write("./Output/castle_chrominance.png");
+  Image im("./Input/castle_small.png");
+  std::vector<Image> LC = lumiChromi(im);
+  LC[0].write("./Output/castle_luminance.png");
+  LC[1].write("./Output/castle_chrominance.png");
 }

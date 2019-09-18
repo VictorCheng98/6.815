@@ -212,8 +212,8 @@ std::vector<Image> gamma_test(const Image &im, int bits, float gamma) {
   // // Return the vector, color image first
   std::vector<Image> output;
   Image im1 = gamma_code(quantize(im, bits), gamma);
-  Image im2 = quantize(gamma_code(im, gamma), bits);
   output.push_back(im1);
+  Image im2 = quantize(gamma_code(im, gamma), bits);
   output.push_back(im2);
   return output;
 }
@@ -225,7 +225,38 @@ std::vector<Image> spanish(const Image &im) {
   // Push the images onto the vector
   // Do all the required processing
   // Return the vector, color image first
-  return std::vector<Image>(); // Change this
+  Image yuv = rgb2yuv(im);
+  Image first(im.width(), im.height(), im.channels());
+  Image second = color2gray(im);
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      first(i, j, 0) = 0.5;
+      first(i, j, 1) = -yuv(i, j, 1);
+      first(i, j, 2) = -yuv(i, j, 2);
+    }
+  }
+  
+  first = yuv2rgb(first);
+  for (int k=0; k<im.channels(); k++) {
+    first(floor(im.width()/2), floor(im.height()/2), k) = 0;
+  }
+  second(floor(im.width()/2), floor(im.height()/2)) = 0;
+
+  std::vector<Image> output;
+  output.push_back(first);
+  output.push_back(second);
+  return output;
+}
+
+float avg_channel(const Image &im, int channel) {
+  float total = 0.0f;
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+        total += im(i, j, channel);
+    }
+  }
+  float x = im.width() / im.height();
+  return total / x;
 }
 
 // White balances an image using the gray world assumption
@@ -235,5 +266,20 @@ Image grayworld(const Image &im) {
   // of the input by a factor such that the three channel of the output
   // image have the same mean value. The mean value of the green channel
   // is taken as reference.
-  return Image(1, 1, 1); // Change this
+  float r = avg_channel(im, 0);
+  float g = avg_channel(im, 1);
+  float rf = g / r;
+  float b = avg_channel(im, 2);
+  float bf = g / b;
+
+  Image output(im.width(), im.height(), im.channels());
+
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      output(i, j, 0) = rf * im(i, j, 0);
+      output(i, j, 1) = im(i, j, 1);
+      output(i, j, 2) = bf * im(i, j, 2);
+    }
+  }
+  return output;
 }
