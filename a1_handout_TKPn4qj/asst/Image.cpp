@@ -18,44 +18,72 @@ long long Image::number_of_elements() const {
   // --------- HANDOUT  PS01 ------------------------------
   // returns the number of elements in the image.
   // An RGB (3 color channels) image of 100 × 100 pixels has 30000 elements
-  return 0; // change this
+    long long num = 1;
+    for (int i=0; i<DIMS; i++) {
+        num *= dim_values[i];
+    }
+    return num;
 }
 
 // -------------- Accessors and Setters -----------------
 const float &Image::operator()(int x) const {
   // --------- HANDOUT  PS01 ------------------------------
   // Linear accessor to the image data
-  throw NotImplementedException(); // change this
+    if (x<0 || x>=number_of_elements()) {
+        throw OutOfBoundsException();
+    }
+    return image_data[x];
 }
 
 const float &Image::operator()(int x, int y) const {
   // --------- HANDOUT  PS01 ------------------------------
   // Accessor to the image data at channel 0
-  throw NotImplementedException(); // change this
+    if (x<0 || x>=width() || 
+        y<0 || y>=height()) {
+        throw OutOfBoundsException(); 
+    }
+    return image_data[x*stride(0) + y*stride(1)];
 }
 
 const float &Image::operator()(int x, int y, int z) const {
   // --------- HANDOUT  PS01 ------------------------------
   // Accessor to the image data at channel z
-  throw NotImplementedException(); // change this
+    if (x<0 || x>=width() || 
+        y<0 || y>=height()||
+        z<0 || z>=channels()) {
+        throw OutOfBoundsException(); 
+    }
+    return image_data[x*stride(0) + y*stride(1) + z*stride(2)];
 }
 
 float &Image::operator()(int x) {
   // --------- HANDOUT  PS01 ------------------------------
   // Linear setter to the image data
-  throw NotImplementedException(); // change this
+  if (x<0 || x>=number_of_elements()) {
+        throw OutOfBoundsException();
+    }
+    return image_data[x];
 }
 
 float &Image::operator()(int x, int y) {
   // --------- HANDOUT  PS01 ------------------------------
   // Setter to the image data at channel 0
-  throw NotImplementedException(); // change this
+    if (x<0 || x>=width() || 
+        y<0 || y>=height()) {
+        throw OutOfBoundsException(); 
+    }
+    return image_data[x*stride(0) + y*stride(1)];
 }
 
 float &Image::operator()(int x, int y, int z) {
   // --------- HANDOUT  PS01 ------------------------------
   // Setter to the image data at channel z
-  throw NotImplementedException(); // change this
+    if (x<0 || x>=width() || 
+        y<0 || y>=height()||
+        z<0 || z>=channels()) {
+        throw OutOfBoundsException(); 
+    }
+    return image_data[x*stride(0) + y*stride(1) + z*stride(2)];
 }
 
 void Image::set_color(float r, float g, float b) {
