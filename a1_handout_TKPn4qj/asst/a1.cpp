@@ -171,19 +171,33 @@ Image saturate(const Image &im, float factor) {
 // Gamma codes the image
 Image gamma_code(const Image &im, float gamma) {
   // // --------- HANDOUT  PS01 ------------------------------
-  // Image output(im.width(), im.height(), im.channels());
+  Image output(im.width(), im.height(), im.channels());
   // Gamma encodes the image
   // return output;
-  return Image(1, 1, 1); // Change this
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      for (int k=0; k<im.channels(); k++) {
+          output(i, j, k) = pow(im(i, j, k), 1.0f / gamma);
+      }
+    }
+  }
+  return output;
 }
 
 // Quantizes the image to 2^bits levels and scales back to 0~1
 Image quantize(const Image &im, int bits) {
   // // --------- HANDOUT  PS01 ------------------------------
-  // Image output(im.width(), im.height(), im.channels());
+  Image output(im.width(), im.height(), im.channels());
   // Quantizes the image to 2^bits levels
   // return output;
-  return Image(1, 1, 1); // Change this
+  for (int i=0; i<im.width(); i++) {
+    for (int j=0; j<im.height(); j++) {
+      for (int k=0; k<im.channels(); k++) {
+          output(i, j, k) = (round(im(i, j, k) * pow(2, bits))) / ((float) pow(2, bits));
+      }
+    }
+  }
+  return output;
 }
 
 // Compare between first quantize then gamma_encode and first gamma_encode
@@ -196,7 +210,12 @@ std::vector<Image> gamma_test(const Image &im, int bits, float gamma) {
   // // Push the images onto the vector
   // // Do all the required processing
   // // Return the vector, color image first
-  return std::vector<Image>(); // Change this
+  std::vector<Image> output;
+  Image im1 = gamma_code(quantize(im, bits), gamma);
+  Image im2 = quantize(gamma_code(im, gamma), bits);
+  output.push_back(im1);
+  output.push_back(im2);
+  return output;
 }
 
 // Return two images in a C++ vector
