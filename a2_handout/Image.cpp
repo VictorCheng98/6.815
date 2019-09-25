@@ -19,7 +19,39 @@ using namespace std;
 // pixel value (clamp = true) when indexing out of the bounds of the image
 float Image::smartAccessor(int x, int y, int z, bool clamp) const {
   // --------- HANDOUT  PS02 ------------------------------
-  return 0.0f; // change this
+  if (clamp) {
+    if (x < 0) {
+      x = 0;
+    }
+    else if (x > width() - 1) {
+      x = width() - 1;
+    }
+
+    if (y < 0) {
+      y = 0;
+    }
+    else if (y > height() - 1) {
+      y = height() - 1;
+    }
+
+    if (z < 0) {
+      z = 0;
+    }
+    else if (z > channels() - 1) {
+      z = channels() - 1;
+    }
+    return (*this)(x, y, z);
+  }
+  else {
+    if (x < 0 || x > width() - 1 ||
+        y < 0 || y > height() - 1 ||
+        z < 0 || z > channels() - 1) {
+      return 0.0f;
+    }
+    else {
+      return (*this)(x, y, z);
+    }
+  }
 }
 // ---------------- END of PS02 -------------------------------------
 
