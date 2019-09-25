@@ -16,7 +16,16 @@ using namespace std;
 Image create_special() {
   // // --------- HANDOUT  PS01 ------------------------------
   // create the image outlined in the handout
-  return Image(1, 1, 1); // change this
+  Image im(290, 150, 3);
+  im.set_color(1.0, 1.0, 1.0);
+  im.create_rectangle(0, 0, 31, 149, .64, .12, .20);
+  im.create_rectangle(52, 0, 83, 102, .64, .12, .20);
+  im.create_rectangle(103, 0, 134, 149, .64, .12, .20);
+  im.create_rectangle(155, 0, 186, 30, .64, .12, .20);
+  im.create_rectangle(155, 48, 186, 149, .55, .55, .55);
+  im.create_rectangle(207, 0, 289, 30, .64, .12, .20);
+  im.create_rectangle(207, 48, 238, 149, .64, .12, .20);
+  return im;
 }
 
 // Change the brightness of the image
@@ -145,7 +154,7 @@ Image yuv2rgb(const Image &im) {
   Image rgb(im.width(), im.height(), im.channels());
   for (int i=0; i<im.width(); i++) {
     for (int j=0; j<im.height(); j++) {
-      rgb(i, j, 0) = im(i, j, 0) + 0 + 1.14 * im(i, j, 2);
+      rgb(i, j, 0) = im(i, j, 0) + 1.14 * im(i, j, 2);
       rgb(i, j, 1) = im(i, j, 0) + -0.395 * im(i, j, 1) + -.581 * im(i, j, 2);
       rgb(i, j, 2) = im(i, j, 0) + 2.032 * im(i, j, 1) + 0;
     }
@@ -177,7 +186,8 @@ Image gamma_code(const Image &im, float gamma) {
   for (int i=0; i<im.width(); i++) {
     for (int j=0; j<im.height(); j++) {
       for (int k=0; k<im.channels(); k++) {
-          output(i, j, k) = pow(im(i, j, k), 1.0f / gamma);
+        float temp = 1.0f / gamma;
+        output(i, j, k) = pow(im(i, j, k), temp);
       }
     }
   }
@@ -193,7 +203,8 @@ Image quantize(const Image &im, int bits) {
   for (int i=0; i<im.width(); i++) {
     for (int j=0; j<im.height(); j++) {
       for (int k=0; k<im.channels(); k++) {
-          output(i, j, k) = (round(im(i, j, k) * pow(2, bits))) / ((float) pow(2, bits));
+          output(i, j, k) = (round(im(i, j, k) * pow(2, bits))) / 
+                            ((float) pow(2, bits));
       }
     }
   }
@@ -235,12 +246,14 @@ std::vector<Image> spanish(const Image &im) {
       first(i, j, 2) = -yuv(i, j, 2);
     }
   }
-  
   first = yuv2rgb(first);
+
+  int w = floor(im.width()/2);
+  int h = floor(im.height()/2);
   for (int k=0; k<im.channels(); k++) {
-    first(floor(im.width()/2), floor(im.height()/2), k) = 0;
+    first(w, h, k) = 0;
   }
-  second(floor(im.width()/2), floor(im.height()/2)) = 0;
+  second(w, h) = 0;
 
   std::vector<Image> output;
   output.push_back(first);

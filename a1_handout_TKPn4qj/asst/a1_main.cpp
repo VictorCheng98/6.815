@@ -13,4 +13,14 @@ int main() {
   std::vector<Image> LC = lumiChromi(im);
   LC[0].write("./Output/castle_luminance.png");
   LC[1].write("./Output/castle_chrominance.png");
+
+  create_special().write("./Output/logo.png");
+
+  Image sat("./Input/skies_and_trees.png");
+  gamma_code(sat, 2.0).write("./Output/o.png");
+  std::vector<Image> p = gamma_test(sat, 4, 1.8);
+  p[0].write("./Output/q.png");
+  p[1].write("./Output/g.png");
+
+  
 }
